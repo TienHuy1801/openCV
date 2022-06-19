@@ -32,11 +32,11 @@ class MainApp(QMainWindow):
 		self.btn10.clicked.connect(lambda: self.cvThresholding(int(self.threshold.toPlainText())))
 		############################################
 		self.btn11.clicked.connect(self.cvImageNagative)
-		self.btn12.clicked.connect(self.logTransformations)
+		self.btn12.clicked.connect(lambda: self.logTransformations(int(self.trans.toPlainText())))
 		self.btn13.clicked.connect(lambda: self.powerlawTransformations(int(self.gamma.toPlainText())))
 		self.btn14.clicked.connect(lambda: self.piecewiseLinearTransformations(int(self.s1.toPlainText()), int(self.s2.toPlainText())))
 		self.btn15.clicked.connect(self.perspectiveTransfomation)
-		self.btn16.clicked.connect(self.thresholdingTransformations)
+		# self.btn16.clicked.connect(self.thresholdingTransformations)
 		self.btn17.clicked.connect(self.showHistograms)
 		self.btn18.clicked.connect(self.showEqualHist)
 		
@@ -45,7 +45,7 @@ class MainApp(QMainWindow):
 		Tk().withdraw()
 		filename = askopenfilename()
 		self.img = cv2.imread(filename)
-# 		self.img = cv2.imread("D:/Python/anh1.jpg")
+		# self.img = cv2.imread("D:/Python/anh2.png")
 		h, w, ch = self.img.shape
 		bytes_per_line = ch * w
 		convert_to_Qt_format = QtGui.QImage(self.img.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888).rgbSwapped()
@@ -161,12 +161,11 @@ class MainApp(QMainWindow):
 		cv2.waitKey(0)
 		cv2.destroyAllWindows()
 
-	def logTransformations(self):
+	def logTransformations(self, thresh):
 		if (type(self.img) == str): 
 			print("Pls input Image")
 			return
 		img = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-		thresh = 1.55
 		#tmpImg = np.uint8(np.log1p(input))
 		#output = cv2.threshold(tmpImg, thresh, 255, cv2.THRESH_BINARY)[1]
 		output = thresh * np.log(1 + img /255)
@@ -188,10 +187,11 @@ class MainApp(QMainWindow):
 		if (type(self.img) == str): 
 			print("Pls input Image")
 			return
-		height, width = self.img.shape[:2] 
+		img_calc = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
+		height, width = img_calc.shape[:2] 
 
-		rMin = self.img.min()  #  The minimum value of the gray level of the original image
-		rMax = self.img.max()  #  The maximum gray level of the original image
+		rMin = img_calc.min()  #  The minimum value of the gray level of the original image
+		rMax = img_calc.max()  #  The maximum gray level of the original image
 		#r1, s1 = rMin, 0  # (x1,y1)
 		#r2, s2 = rMax, 255  # (x2,y2)
 		r1 = rMin
@@ -208,12 +208,12 @@ class MainApp(QMainWindow):
 		k3 = (255 - s2) / (255 - r2)  # imgGray[h,w] > r2
 		for h in range(height):
 			for w in range(width):
-				if self.img[h,w] < r1:
-					imgStretch[h,w] = k1 * self.img[h,w]
-				elif r1 <= self.img[h,w] <= r2:
-						imgStretch[h,w] = k2 * (self.img[h,w] - r1) + s1
-				elif self.img[h,w] > r2:
-						imgStretch[h,w] = k3 * (self.img[h,w] - r2) + s2		
+				if img_calc[h,w] < r1:
+					imgStretch[h,w] = k1 * img_calc[h,w]
+				elif r1 <= img_calc[h,w] <= r2:
+						imgStretch[h,w] = k2 * (img_calc[h,w] - r1) + s1
+				elif img_calc[h,w] > r2:
+						imgStretch[h,w] = k3 * (img_calc[h,w] - r2) + s2		
 		plt.figure(figsize=(10,3.5))
 		plt.subplots_adjust(left=0.2, bottom=0.2, right=0.9, top=0.8, wspace=0.1, hspace=0.1)
 		plt.subplot(131), plt.title("s=T(r)")
@@ -225,7 +225,7 @@ class MainApp(QMainWindow):
 		plt.text(120, 215, "(r2,s2)", fontsize=10)
 		plt.xlabel("r, Input value")
 		plt.ylabel("s, Output value")
-		plt.subplot(132), plt.imshow(self.img, cmap='gray', vmin=0, vmax=255), plt.title("Input"), plt.axis('off')
+		plt.subplot(132), plt.imshow(img_calc, cmap='gray', vmin=0, vmax=255), plt.title("Input"), plt.axis('off')
 		plt.subplot(133), plt.imshow(imgStretch, cmap='gray', vmin=0, vmax=255), plt.title("Output"), plt.axis('off')
 		plt.show()
 		# plt.savefig('foo.png')
@@ -249,13 +249,13 @@ class MainApp(QMainWindow):
 		cv2.waitKey(0)
 		cv2.destroyAllWindows() 
 	
-	def thresholdingTransformations(self):
-		output = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-		output[output < 210] = 0
+	# def thresholdingTransformations(self):
+	# 	output = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
+	# 	output[output < 210] = 0
 		
-		cv2.imshow('image', output)
-		cv2.waitKey(0)
-		cv2.destroyAllWindows() 
+	# 	cv2.imshow('image', output)
+	# 	cv2.waitKey(0)
+	# 	cv2.destroyAllWindows() 
 	#########################
 	def Hist(self, input):
 		s = input.shape
