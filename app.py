@@ -42,10 +42,10 @@ class MainApp(QMainWindow):
 		
 ###########################################################
 	def cvInput(self):
-		# Tk().withdraw()
-		# filename = askopenfilename()
-		# self.img = cv2.imread(filename)
-		self.img = cv2.imread("D:/Python/anh1.jpg")
+		Tk().withdraw()
+		filename = askopenfilename()
+		self.img = cv2.imread(filename)
+# 		self.img = cv2.imread("D:/Python/anh1.jpg")
 		h, w, ch = self.img.shape
 		bytes_per_line = ch * w
 		convert_to_Qt_format = QtGui.QImage(self.img.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888).rgbSwapped()
